@@ -1,6 +1,8 @@
-const { StatusCodes } = require("http-status-codes");
-const { UserRepository } = require("../repositories");
-const AppError = require("../utils/error/app-error");
+const { StatusCodes } = require('http-status-codes');
+const { UserRepository } = require('../repositories');
+const AppError = require('../utils/error/app-error');
+const { Auth } = require('../utils/common');
+
 const userRepository = new UserRepository();
 
 async function create(data) {
@@ -22,6 +24,33 @@ async function create(data) {
     }
 }
 
+async function signIn(data) {
+    try {
+        const {email, password} = data;
+        const user = await userRepository.checkEmail(email);
+
+        if(!user) {
+            throw new AppError("No user found for given email", StatusCodes.NOT_FOUND);
+        }
+
+        const passwordMatch = Auth.checkPassword(password, user.password);
+
+        if(!passwordMatch) {
+            throw new AppError("Incorrect password", StatusCodes.BAD_REQUEST);
+        }
+
+        const jwtToken = Auth.createToken({email: email, password: password});
+
+        return jwtToken;
+    } catch (error) {
+        if(error instanceof AppError) {
+            return error;
+        }
+        return error;
+    }
+}
+
 module.exports = {
-    create
+    create,
+    signIn
 }
