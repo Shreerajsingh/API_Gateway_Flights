@@ -6,7 +6,7 @@ function checkPassword(userPassword, encryptedPassword) {
     try {
         return bcrypt.compareSync(userPassword, encryptedPassword);
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 
@@ -16,7 +16,7 @@ function createToken(input) {
 
         return token;
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 

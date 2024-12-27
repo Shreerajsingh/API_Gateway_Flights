@@ -35,6 +35,8 @@ async function signIn(data) {
 
         const passwordMatch = Auth.checkPassword(password, user.password);
 
+        console.log(">>> ", data, passwordMatch);
+
         if(!passwordMatch) {
             throw new AppError("Incorrect password", StatusCodes.BAD_REQUEST);
         }
@@ -44,9 +46,9 @@ async function signIn(data) {
         return jwtToken;
     } catch (error) {
         if(error instanceof AppError) {
-            return error;
+            throw error;
         }
-        return error;
+        throw error;
     }
 }
 
