@@ -35,13 +35,11 @@ async function signIn(data) {
 
         const passwordMatch = Auth.checkPassword(password, user.password);
 
-        console.log(">>> ", data, passwordMatch);
-
         if(!passwordMatch) {
             throw new AppError("Incorrect password", StatusCodes.BAD_REQUEST);
         }
 
-        const jwtToken = Auth.createToken({email: email, password: password});
+        const jwtToken = Auth.createToken({id: user.id, email: email});
 
         return jwtToken;
     } catch (error) {
@@ -52,7 +50,38 @@ async function signIn(data) {
     }
 }
 
+async function isAuthenticated(token) {
+    try {
+        if(!token) {
+            throw new AppError("Missing JWT token", StatusCodes.BAD_REQUEST);
+        }
+
+        const response = Auth.verifyToken(token);
+        console.log(response);
+        const user = await userRepository.get(response.id);
+
+        if(!user) {
+            throw new AppError("User not found", StatusCodes.BAD_REQUEST);
+        }
+
+        return user.id;
+    } catch (error) {
+        if(error instanceof AppError) throw error;
+        
+        if(error.name == 'JsonWebTokenError') {
+            throw new AppError("Invalid JWT token", StatusCodes.BAD_REQUEST);
+        }
+
+        if(error.name == 'TokenExpiredError') {
+            throw new AppError("JWT token expired", StatusCodes.BAD_REQUEST);
+        }
+
+        throw new AppError("Somthing went wrong", StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 module.exports = {
     create,
-    signIn
+    signIn,
+    isAuthenticated
 }
