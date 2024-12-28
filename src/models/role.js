@@ -13,11 +13,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsToMany(models.User, {through: 'User_Roles', as: 'user'})
     }
   }
   Role.init({
     name: {
-      type: DataTypes.ENUMS,
+      type: DataTypes.ENUM,
       values: [ADMIN, CUSTOMER, FLIGHT_COMPANY],
       defaultValue: CUSTOMER,
       allowNull: false

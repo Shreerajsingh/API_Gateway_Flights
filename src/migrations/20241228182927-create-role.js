@@ -14,7 +14,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM,
         allowNull: false,
         values: [ADMIN, CUSTOMER, FLIGHT_COMPANY],
         defaultValue: CUSTOMER
